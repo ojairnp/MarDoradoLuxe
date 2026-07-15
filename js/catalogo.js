@@ -10,8 +10,15 @@ async function cargarCatalogo() {
   }
 }
 
+function ordenarVideosPrimero(productos) {
+  const videos = productos.filter(function (p) { return p.tipo === 'video'; });
+  const imagenes = productos.filter(function (p) { return p.tipo === 'imagen'; });
+  return videos.concat(imagenes);
+}
+
 function crearTarjeta(producto) {
-  const mensaje = encodeURIComponent('Hola, me interesa una de sus bolsas del catalogo.');
+  const urlCompleta = window.location.origin + producto.imagen_url;
+  const mensaje = encodeURIComponent('Hola, me interesa esta pieza: ' + urlCompleta);
   const waLink = 'https://wa.me/529987572466?text=' + mensaje;
 
   const media = producto.tipo === 'video'
@@ -31,13 +38,14 @@ function crearTarjeta(producto) {
 async function init() {
   const grid = document.getElementById('grid-productos');
   const productos = await cargarCatalogo();
+  const ordenados = ordenarVideosPrimero(productos);
 
-  if (productos.length === 0) {
+  if (ordenados.length === 0) {
     grid.innerHTML = '<p class="sin-resultados">Catalogo en preparacion.</p>';
     return;
   }
 
-  grid.innerHTML = productos.map(crearTarjeta).join('');
+  grid.innerHTML = ordenados.map(crearTarjeta).join('');
 }
 
 init();
